@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎄 SANTA İS COMİNG TOWN !!!🎄 </title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+    height:100vh;
+    background:black;
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+    color:white;
+    perspective:800px;
+}
+
+/* 3D PARALLAX */
+.layer{
+    position:absolute;
+    width:120%;
+    height:120%;
+    top:-10%;
+    left:-10%;
+    background-repeat:no-repeat;
+    background-position:center;
+}
+.bg1{
+    background:radial-gradient(circle,#ff00ff33,#000);
+    transform:translateZ(-300px) scale(1.4);
+}
+.bg2{
+    background:radial-gradient(circle,#00ffff33,#000);
+    transform:translateZ(-150px) scale(1.2);
+}
+
+/* KAR */
+.snow{
+    position:fixed;
+    top:-10px;
+    color:white;
+    animation:fall linear infinite;
+    opacity:.8;
+}
+@keyframes fall{
+    to{transform:translateY(110vh)}
+}
+
+/* ANA */
+.container{
+    position:relative;
+    z-index:10;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+
+/* NEON */
+h1{
+   font-size:3.1rem;          /* ESKİ: 2.8rem */
+    margin-bottom:30px;
+    text-shadow:
+        0 0 10px #0ff,
+        0 0 25px #0ff,
+        0 0 50px #f0f,
+        0 0 80px #f0f;
+}
+
+/* SAYAÇ */
+.countdown{display:flex;gap:15px}
+.time-box{
+    width:110px;height:110px;border-radius:50%;
+    background:#111;
+    box-shadow:0 0 20px #0ff,
+    inset 0 0 15px  #00ffff66;
+    display:flex;flex-direction:column;
+    justify-content:center;align-items:center;
+}
+.time-box span{font-size:2.1rem}
+.time-box small{font-size:.7rem}
+
+/* AĞAÇ */
+.tree{
+    font-size:10rem;
+    margin:15px 0;
+    animation:treeGlow 1.5s infinite alternate;
+}
+@keyframes treeGlow{
+    from{text-shadow:0 0 10px #0f0}
+    to{text-shadow:0 0 30px #0ff,0 0 60px #f0f}
+}
+
+/* HEDİYELER */
+.gifts span{
+    font-size:3.5rem;
+    cursor:pointer;
+    margin:0 5px;
+    transition:.3s;
+}
+.gifts span:hover{transform:scale(1.3)}
+
+/* PLAYER */
+.player{
+    width:260px;
+    background:#111;
+    border-radius:15px;
+    padding:15px;
+    box-shadow:0 0 20px #0ff;
+    margin-top:15px;
+}
+.controls button{
+    margin:5px;
+    padding:8px 12px;
+    border:none;
+    border-radius:50%;
+    cursor:pointer;
+}
+
+/* POPUP */
+.popup{
+    position:fixed;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    background:white;color:black;
+    padding:25px;
+    border-radius:20px;
+    display:none;
+    z-index:999;
+    font-size:1.1rem;
+}
+
+/* CONFETTI */
+.confetti{
+    position:fixed;
+    width:10px;height:10px;
+    animation:confetti 4s linear forwards;
+}
+@keyframes confetti{
+    to{transform:translateY(120vh) rotate(1440deg);opacity:0}
+}
+
+/* SANTA */
+.santa{
+    position:fixed;
+    font-size:4rem;
+    animation:santa 5s linear infinite;
+}
+@keyframes santa{
+    from{left:-20%;top:20%}
+    to{left:120%;top:60%}
+}
+</style>
+</head>
+
+<body>
+
+<div class="layer bg1"></div>
+<div class="layer bg2"></div>
+
+<div class="container">
+    <h1>🎄 SANTA İS COMİNG TOWN !!! 🎄 </h1>
+
+    <div class="countdown">
+        <div class="time-box"><span id="d">0</span><small>GÜN</small></div>
+        <div class="time-box"><span id="h">0</span><small>SAAT</small></div>
+        <div class="time-box"><span id="m">0</span><small>DK</small></div>
+        <div class="time-box"><span id="s">0</span><small>SN</small></div>
+    </div>
+
+    <div class="tree" id="tree">🎄</div>
+
+    <div class="gifts">
+        <span onclick="surprise()">🎁</span>
+        <span onclick="surprise()">🎁</span>
+        <span onclick="surprise()">🎁</span>
+    </div>
+
+    <div class="player">
+        <div id="track">🎵 Track</div>
+        <div class="controls">
+            <button onclick="prev()">⏮</button>
+            <button id ="plyBtn" onclick="toogle()">▶️ / ⏸</button>
+            <button onclick="next()">⏭</button>
+        </div>
+        <input type="range" min="0" max="1" step="0.01" onchange="audio.volume=this.value">
+    </div>
+</div>
+
+<div class="popup" id="popup"></div>
+<div class="santa">🎅🚀</div>
+
+
+<audio id="audio"></audio>
+
+<script>
+/* PARALLAX */
+document.addEventListener("mousemove",e=>{
+    bg1.style.transform=`translate(${e.clientX/50}px,${e.clientY/50}px)`;
+    bg2.style.transform=`translate(${e.clientX/30}px,${e.clientY/30}px)`;
+});
+
+/* KAR */
+setInterval(()=>{
+    const s=document.createElement("div");
+    s.className="snow";
+    s.innerHTML="❄️";
+    s.style.left=Math.random()*innerWidth+"px";
+    s.style.fontSize=10+Math.random()*20+"px";
+    s.style.animationDuration=4+Math.random()*6+"s";
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),10000);
+},150);
+
+/* COUNTDOWN */
+const ny=new Date("January 1, 2026 00:00:00").getTime();
+setInterval(()=>{
+    const d=ny-Date.now();
+    d<=0 && startConfetti(300);
+    document.getElementById("d").innerText=Math.max(0,Math.floor(d/86400000));
+    document.getElementById("h").innerText=Math.max(0,Math.floor(d/3600000)%24);
+    document.getElementById("m").innerText=Math.max(0,Math.floor(d/60000)%60);
+    document.getElementById("s").innerText=Math.max(0,Math.floor(d/1000)%60);
+},1000);
+
+/* PLAYLIST */
+const tracks=[
+  {file:"Dean_Martin-Let_İt_Snow.mp3", name:"🎵 Dean Martin - Let İt Snow!"},
+  {file:"Libera-Carol_of_the_Bells.mp3", name:"🎵 Libera - Carol of the Bells"},
+  {file:"Mariah_Carey-All_I_Want_for_Christmas_Is_You.mp3", name:"🎵Mariah Carey - All I Want for Christmas Is You"}
+];
+
+let i=0;
+const audio=document.getElementById("audio");
+const trackName=document.getElementById("track");
+
+audio.src=tracks[i].file;
+trackName.innerText=tracks[i].name;
+
+function next(){
+    i=(i+1)%tracks.length;
+    audio.src=tracks[i].file;
+    trackName.innerText=tracks[i].name;
+    audio.play();
+}
+function prev(){
+    i=(i-1+tracks.length)%tracks.length;
+    audio.src=tracks[i].file;
+    trackName.innerText=tracks[i].name;
+    audio.play();
+}
+const plyBtn=document.getElementById("plyBtn");
+
+function toogle(){
+    if(audio.paused){
+        audio.play();
+        plyBtn.innerText="⏸";
+    }
+    else{
+        audio.pause();
+        plyBtn.innerText="▶️";
+    }
+}
+
+/* CONFETTI */
+function startConfetti(n){
+    for(let i=0;i<n;i++){
+        const c=document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*innerWidth+"px";
+        c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),4000);
+    }
+}
+
+/* SÜRPRİZ + EASTER EGG */
+let clicks=0;
+const msgs=[
+    " Yeni yılda dertlerin 'abonelik iptali' gibi olsun,mutlulukların ise 'sınırsız paket'!",
+    " Geçen yıl yapamadığın tüm o 'Pazartesi başlayacağım' dediğin diyetlerin ve sporların gerçekleştigi o efsane yıl bu yıl olsun",
+    "🎉 Yeni yılda şans seninle olsun!",
+    "Sağlık, aşk ve para dolu bir yıl dilerim!",
+    "Bu yil senin yılın olsun; başarılarınla parladığın bir sene dilerim.",
+    "📈 Yeni yılda attığınız her adımın size iyi sonuçlar getirmesini dilerim.",
+    "Eski defterleri kapatıp, en güzel hikayelerini yazacağın bir yıl olsun.",
+    "🤝 Yeni yılda hem iş hayatınızda hem özel yaşamınızda gönlünüzden geçenlerin gerçekleşmesini dilerim",
+    "Sıradan bir yıl değil, senin yılın olsun",
+    "Gule gule 2025, hoş geldin 2026. Her anın tadını çıkar.",
+    "2026 sana sadece güzellikler getirsin. Mutlu yıllar!",
+    "🎉Yeni yıl, yeni umutlar, yeni başarılar... Iyi seneler!🎉",
+    "❤️ Aşk kapıda!",
+    "Yeni yılda zamlar az, keyifler çok olsun 😄",
+    "Mutlu yıllar! Her şey gönlünce olsun",
+    "✨Yeni yılın iş ve özel hayatınıza değer katmasını dilerim.",
+    "Sağlığın, huzurun ve küçük mutlulukların eksik olmadığı bir yıl dilerim.",
+    "🏆 Yeni yılda mutluluğunuzun kalıcı, başarılarınızın sürdürülebilir olmasını temenni ederim.",
+    "🙂 Sağlık, huzur ve içten bir tebessümün eksik olmadığı bir yıl dilerim.",
+    "🎁 Yeni yılın size ve sevdiklerinize hayırlı gelişmeler getirmesini dilerim."
+];
+function surprise(){show(msgs[Math.floor(Math.random()*msgs.length)])}
+tree.onclick=()=>{
+    clicks++;
+    if(clicks===5){
+        show("🎮 EASTER EGG AKTİF!");
+        startConfetti(500);
+    }
+}
+
+/* POPUP */
+function show(t){
+    popup.innerText=t;
+    popup.style.display="block";
+    setTimeout(()=>popup.style.display="none",2700);
+}
+</script>
+
+</body>
+</html>
