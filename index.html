@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎄 SANTA İS COMİNG TOWN !!!🎄 </title>
+<title>🎄 NOEL BABA ŞEHRİNİZE GELİYOR !!!🎄 </title>
 
 <style>
     html, body {
@@ -149,6 +149,12 @@ h1{
         0 0 80px #f0f;
 }
 
+.footer-bottom{
+    font-size: 19px;
+    margin: 12px;
+    display: -webkit-flex;
+}
+
 /* SAYAÇ */
 .countdown{display:flex;gap:15px}
 .time-box{
@@ -241,7 +247,7 @@ h1{
 <div class="layer bg2"></div>
 
 <div class="container">
-    <h1>🎄 SANTA İS COMİNG TOWN !!! 🎄 </h1>
+    <h1>🎄 NOEL BABA ŞEHRİNİZE GELİYOR !!!🎄 </h1>
 
     <div class="countdown">
         <div class="time-box"><span id="d">0</span><small>GÜN</small></div>
@@ -267,6 +273,15 @@ h1{
         </div>
         <input type="range" min="0" max="1" step="0.01" onchange="audio.volume=this.value">
     </div>
+    <div id= "Copyright" class ="footer-bottom">
+    <div class="row">
+    <div class = "col-md-12">
+        <div class ="footer-bottom-left">
+        <p>Copyright © 2025 Diyar Yıldırım IT Support -  Tüm hakları saklıdır. Bilgi için iletişime geçiniz.</p>
+  </div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="popup" id="popup"></div>
@@ -274,6 +289,7 @@ h1{
 
 
 <audio id="audio"></audio>
+
 
 <script>
 /* PARALLAX */
@@ -400,7 +416,7 @@ tree.onclick=()=>{
 function show(t){
     popup.innerText=t;
     popup.style.display="block";
-    setTimeout(()=>popup.style.display="none",2700);
+    setTimeout(()=>popup.style.display="none",3200);
 }
 </script>
 
