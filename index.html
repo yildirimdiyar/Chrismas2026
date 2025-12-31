@@ -30,6 +30,11 @@ body {
         margin-bottom: 20px;
     }
 
+    .footer-bottom{
+        font-size: 19px;
+        margin:12px;
+    }
+
     .tree {
         font-size: 6rem;
     }
@@ -238,6 +243,54 @@ h1{
     from{left:-20%;top:20%}
     to{left:120%;top:60%}
 }
+
+#game {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    padding: 15px;
+    border-radius: 20px;
+    text-align: center;
+    z-index: 9999;
+    color: #fff;
+}
+
+#gift-area {
+    position: relative;
+    width: 300px;
+    height: 200px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.gift {
+    position: absolute;
+    font-size: 2.5rem;
+    cursor: pointer;
+}
+
+#closeGame {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.neon-1 { box-shadow: 0 0 15px #00fff7; }
+.neon-2 { box-shadow: 0 0 15px #00ff6a; }
+.neon-3 { box-shadow: 0 0 15px #ffe600; }
+.neon-4 { box-shadow: 0 0 15px #ff9100; }
+.neon-5 { box-shadow: 0 0 15px #ff005d; }
+
+
+
+
 </style>
 </head>
 
@@ -278,11 +331,22 @@ h1{
     <div class = "col-md-12">
         <div class ="footer-bottom-left">
         <p>Copyright © 2025 Diyar Yıldırım IT Support -  Tüm hakları saklıdır. Bilgi için iletişime geçiniz.</p>
-  </div>
+    </div>
 </div>
 </div>
 </div>
 </div>
+
+
+
+<div id="game">
+    <button id="closeGame">✖</button>
+    <h2>🎁 Hediyeleri Yakala!</h2>
+    <div id="score">Skor: 0 | Rekor: 0</div>
+    <div id="gift-area"></div>
+    <button onclick="startGame()">Oyunu Başlat</button>
+</div>
+
 
 <div class="popup" id="popup"></div>
 <div class="santa">🎅🚀</div>
@@ -418,6 +482,92 @@ function show(t){
     popup.style.display="block";
     setTimeout(()=>popup.style.display="none",3200);
 }
+
+/*Mini Oyun*/
+let score = 0;
+let gameInterval;
+let highScore = localStorage.getItem("giftHighScore") || 0;
+
+
+function startGame() {
+    score = 0;
+    document.getElementById("score").innerText =
+    `Skor: 0 | Rekor: ${highScore}`;
+    updateNeon();
+    const area = document.getElementById("gift-area");
+    area.innerHTML = "";
+
+    gameInterval = setInterval(() => {
+        const gift = document.createElement("div");
+        gift.className = "gift";
+        gift.innerText = "🎁";
+
+        gift.style.left = Math.random() * 260 + "px";
+        gift.style.top = Math.random() * 160 + "px";
+
+       gift.onclick = () => {
+    score++;
+
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("giftHighScore", highScore);
+    }
+
+    document.getElementById("score").innerText =
+      `Skor: ${score} | Rekor: ${highScore}`;
+
+    updateNeon();
+    gift.remove();
+};
+
+
+        area.appendChild(gift);
+
+        setTimeout(() => gift.remove(), 1500);
+    }, 700);
+
+    setTimeout(() => {
+        clearInterval(gameInterval);
+        alert("🎉 Oyun Bitti! Skorun: " + score);
+    }, 10000);
+}
+
+const tree = document.getElementById("tree");
+const game = document.getElementById("game");
+const closeGame = document.getElementById("closeGame");
+
+tree.addEventListener("click", openGame);
+tree.addEventListener("touchstart", openGame);
+
+function openGame() {
+    game.style.display = "block";
+    startGame();
+}
+
+closeGame.addEventListener("click", () => {
+    game.style.display = "none";
+    clearInterval(gameInterval);
+});
+
+function updateNeon() {
+    game.className = "";
+
+    if (score >= 20) game.classList.add("neon-5");
+    else if (score >= 15) game.classList.add("neon-4");
+    else if (score >= 10) game.classList.add("neon-3");
+    else if (score >= 5) game.classList.add("neon-2");
+    else game.classList.add("neon-1");
+}
+
+gift.onclick = () => {
+    score++;
+    document.getElementById("score").innerText = "Skor: " + score;
+    updateNeon();
+    gift.remove();
+};
+
+
+
 </script>
 
 </body>
