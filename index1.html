@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎄 Christmas 2026</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{
+    width:100%;
+    height:100%;
+    background:#050914;
+    color:white;
+    font-family:Arial,sans-serif;
+    overflow-x:hidden;
+}
+
+/* NEON */
+.neon{text-shadow:0 0 10px #0ff,0 0 30px #f0f}
+
+/* KAR */
+.snow{position:fixed;top:-10px;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(110vh)}}
+
+/* MERKEZ */
+.container{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+
+/* AĞAÇ */
+#tree{
+    font-size:9rem;
+    cursor:pointer;
+    animation:blink 1.4s infinite alternate;
+}
+@keyframes blink{
+    from{text-shadow:0 0 15px #0f0}
+    to{text-shadow:0 0 35px #0ff}
+}
+
+/* COUNTDOWN */
+.countdown{display:flex;gap:12px;margin:20px 0}
+.time{
+    width:75px;height:75px;border-radius:50%;
+    border:2px solid #0ff;
+    display:flex;flex-direction:column;
+    justify-content:center;
+    box-shadow:0 0 15px #0ff;
+}
+
+/* PLAYER */
+.player{
+    margin-top:20px;
+    background:rgba(0,0,0,.6);
+    padding:15px;
+    border-radius:20px;
+    width:300px;
+}
+.player button{
+    background:none;border:none;color:white;
+    font-size:1.3rem;cursor:pointer;
+}
+
+/* GAME */
+#game{
+    display:none;
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    width:320px;
+    background:rgba(0,0,0,.9);
+    padding:15px;
+    border-radius:20px;
+    z-index:9999;
+}
+#gift-area{
+    height:220px;
+    border:2px dashed rgba(255,255,255,.3);
+    margin-top:10px;
+    position:relative;
+    overflow:hidden;
+}
+.gift{position:absolute;font-size:2.5rem;cursor:pointer}
+#closeGame{
+    position:absolute;top:8px;right:12px;
+    background:none;border:none;color:white;
+    font-size:1.3rem;cursor:pointer;
+}
+
+/* POPUP */
+.popup{
+    position:fixed;
+    bottom:30px;left:50%;
+    transform:translateX(-50%);
+    background:white;color:black;
+    padding:15px 20px;
+    border-radius:20px;
+    display:none;
+    z-index:99999;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1 class="neon">🎄 Yeni Yıla Geri Sayım 🎄</h1>
+    <div class="countdown" id="countdown"></div>
+    <div id="tree">🎄</div>
+
+    <div class="player">
+        <div id="track">🎵 Christmas Playlist</div>
+        <button id="playBtn">▶️ / ⏸</button>
+    </div>
+</div>
+
+<div id="game">
+    <button id="closeGame">✖</button>
+    <div id="score">Skor: 0 | Rekor: 0</div>
+    <div id="gift-area"></div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<audio id="audio"></audio>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+
+/* COUNTDOWN */
+const target=new Date("Jan 1, 2026 00:00:00").getTime();
+const cd=document.getElementById("countdown");
+setInterval(()=>{
+const d=target-new Date().getTime();
+if(d<0){cd.innerHTML="🎉 Mutlu Yıllar!";return;}
+cd.innerHTML=[
+["Gün",d/86400000],
+["Saat",d/3600000%24],
+["Dak",d/60000%60],
+["Sn",d/1000%60]
+].map(x=>`<div class="time"><b>${Math.floor(x[1])}</b>${x[0]}</div>`).join("");
+},1000);
+
+/* KAR */
+setInterval(()=>{
+const s=document.createElement("div");
+s.className="snow";
+s.innerText="❄️";
+s.style.left=Math.random()*innerWidth+"px";
+s.style.fontSize=10+Math.random()*20+"px";
+s.style.animationDuration=4+Math.random()*6+"s";
+document.body.appendChild(s);
+setTimeout(()=>s.remove(),10000);
+},250);
+
+/* PLAYER */
+const tracks=["music1.mp3","music2.mp3","music3.mp3"];
+let i=0,playing=false;
+const audio=document.getElementById("audio");
+const playBtn=document.getElementById("playBtn");
+audio.src=tracks[i];
+
+function toggleMusic(){
+if(!playing){audio.play();playing=true;}
+else{audio.pause();playing=false;}
+}
+playBtn.onclick=toggleMusic;
+
+/* POPUP */
+const popup=document.getElementById("popup");
+function showPopup(msg){
+popup.innerText=msg;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",2000);
+}
+
+/* GAME */
+const tree=document.getElementById("tree");
+const game=document.getElementById("game");
+const giftArea=document.getElementById("gift-area");
+const scoreEl=document.getElementById("score");
+const closeGame=document.getElementById("closeGame");
+
+let score=0,interval;
+let highScore=localStorage.getItem("giftHighScore")||0;
+let treeClicks=0;
+
+function startGame(){
+clearInterval(interval);
+giftArea.innerHTML="";
+score=0;
+scoreEl.innerText=`Skor: 0 | Rekor: ${highScore}`;
+interval=setInterval(()=>{
+const g=document.createElement("div");
+g.className="gift";
+g.innerText="🎁";
+g.style.left=Math.random()*(giftArea.clientWidth-40)+"px";
+g.style.top=Math.random()*(giftArea.clientHeight-40)+"px";
+g.onclick=()=>{
+score++;
+showPopup(["🎄 Mutlu Yıllar!","🎁 Sürpriz!","✨ Şans Seninle!"][Math.floor(Math.random()*3)]);
+if(score>highScore){
+highScore=score;
+localStorage.setItem("giftHighScore",highScore);
+}
+scoreEl.innerText=`Skor: ${score} | Rekor: ${highScore}`;
+g.remove();
+};
+giftArea.appendChild(g);
+setTimeout(()=>g.remove(),1500);
+},700);
+}
+
+/* TREE CLICK = MÜZİK + OYUN */
+tree.onclick=()=>{
+treeClicks++;
+if(!playing) toggleMusic();
+if(treeClicks===7) showPopup("🎅 Gizli mesajı buldun!");
+game.style.display="block";
+startGame();
+};
+
+closeGame.onclick=()=>{
+game.style.display="none";
+clearInterval(interval);
+};
+
+});
+</script>
+
+</body>
+</html>

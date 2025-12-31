@@ -90,6 +90,22 @@ body {
     overflow: hidden;
 }
 
+#tree {
+    position: relative;
+    z-index: 100000;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.snow,
+.confetti,
+.layer,
+.santa {
+    pointer-events: none;
+}
+
+
+
 *{margin:0;padding:0;box-sizing:border-box}
 body{
     height:100vh;
@@ -245,23 +261,25 @@ h1{
 }
 
 #game {
+    display: none;
     position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,0.7);
+    width: 320px;
+    background: rgba(0,0,0,0.85);
     padding: 15px;
     border-radius: 20px;
-    text-align: center;
-    z-index: 9999;
+    z-index: 99999;
     color: #fff;
 }
 
 #gift-area {
     position: relative;
-    width: 300px;
-    height: 200px;
+    width: 100%;
+    height: 220px;
     overflow: hidden;
+    border: 2px dashed rgba(255,255,255,0.3);
     margin-top: 10px;
 }
 
@@ -311,6 +329,15 @@ h1{
 
     <div class="tree" id="tree">🎄</div>
 
+    <div id="game">
+    <button id="closeGame">✖</button>
+    <h2>🎁 Hediyeleri Yakala!</h2>
+    <div id="score">Skor: 0 | Rekor: 0</div>
+    <div id="gift-area"></div>
+
+    </div>
+
+
     <div class="gifts">
         <span onclick="surprise()">🎁</span>
         <span onclick="surprise()">🎁</span>
@@ -338,16 +365,6 @@ h1{
 </div>
 
 
-
-<div id="game">
-    <button id="closeGame">✖</button>
-    <h2>🎁 Hediyeleri Yakala!</h2>
-    <div id="score">Skor: 0 | Rekor: 0</div>
-    <div id="gift-area"></div>
-    <button onclick="startGame()">Oyunu Başlat</button>
-</div>
-
-
 <div class="popup" id="popup"></div>
 <div class="santa">🎅🚀</div>
 
@@ -356,6 +373,8 @@ h1{
 
 
 <script>
+    console.log("JS ÇALIŞIYOR");
+
 /* PARALLAX */
 if (window.innerWidth > 768) {
     document.addEventListener("mousemove", e => {
@@ -394,9 +413,9 @@ setInterval(()=>{
 
 /* PLAYLIST */
 const tracks=[
-  {file:"Dean_Martin-Let_İt_Snow.mp3", name:"🎵 Dean Martin - Let İt Snow!"},
-  {file:"Libera-Carol_of_the_Bells.mp3", name:"🎵 Libera - Carol of the Bells"},
-  {file:"Mariah_Carey-All_I_Want_for_Christmas_Is_You.mp3", name:"🎵Mariah Carey - All I Want for Christmas Is You"}
+    {file:"Dean_Martin-Let_İt_Snow.mp3", name:"🎵 Dean Martin - Let İt Snow!"},
+    {file:"Libera-Carol_of_the_Bells.mp3", name:"🎵 Libera - Carol of the Bells"},
+    {file:"Mariah_Carey-All_I_Want_for_Christmas_Is_You.mp3", name:"🎵Mariah Carey - All I Want for Christmas Is You"}
 ];
 
 let i=0;
@@ -484,89 +503,80 @@ function show(t){
 }
 
 /*Mini Oyun*/
+
 let score = 0;
 let gameInterval;
 let highScore = localStorage.getItem("giftHighScore") || 0;
 
+const tree = document.getElementById("tree");
+const game = document.getElementById("game");
+const closeGame = document.getElementById("closeGame");
+const scoreEl = document.getElementById("score");
+const giftArea = document.getElementById("gift-area");
+
+function updateScore() {
+    scoreEl.innerText = `Skor: ${score} | Rekor: ${highScore}`;
+}
 
 function startGame() {
+    console.log("OYUN BAŞLADI");
+
+    clearInterval(gameInterval);
+    giftArea.innerHTML = "";
     score = 0;
-    document.getElementById("score").innerText =
-    `Skor: 0 | Rekor: ${highScore}`;
-    updateNeon();
-    const area = document.getElementById("gift-area");
-    area.innerHTML = "";
+    updateScore();
 
     gameInterval = setInterval(() => {
         const gift = document.createElement("div");
         gift.className = "gift";
         gift.innerText = "🎁";
 
-        gift.style.left = Math.random() * 260 + "px";
-        gift.style.top = Math.random() * 160 + "px";
+        gift.style.left = Math.random() * (giftArea.clientWidth - 40) + "px";
+        gift.style.top = Math.random() * (giftArea.clientHeight - 40) + "px";
 
-       gift.onclick = () => {
-    score++;
+        gift.onclick = () => {
+            score++;
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem("giftHighScore", highScore);
+            }
+            updateScore();
+            gift.remove();
+        };
 
-    if (score > highScore) {
-        highScore = score;
-        localStorage.setItem("giftHighScore", highScore);
-    }
-
-    document.getElementById("score").innerText =
-      `Skor: ${score} | Rekor: ${highScore}`;
-
-    updateNeon();
-    gift.remove();
-};
-
-
-        area.appendChild(gift);
+        giftArea.appendChild(gift);
 
         setTimeout(() => gift.remove(), 1500);
     }, 700);
-
-    setTimeout(() => {
-        clearInterval(gameInterval);
-        alert("🎉 Oyun Bitti! Skorun: " + score);
-    }, 10000);
 }
+document.addEventListener("DOMContentLoaded", () => {
 
-const tree = document.getElementById("tree");
-const game = document.getElementById("game");
-const closeGame = document.getElementById("closeGame");
+    const tree = document.getElementById("tree");
+    const game = document.getElementById("game");
 
-tree.addEventListener("click", openGame);
-tree.addEventListener("touchstart", openGame);
+    if (!tree) {
+        console.error("TREE BULUNAMADI");
+        return;
+    }
 
-function openGame() {
-    game.style.display = "block";
-    startGame();
-}
+    tree.addEventListener("click", () => {
+        console.log("AĞAÇ TIKLANDI 🌲");
+        game.style.display = "block";
+        startGame();
+    });
+
+    tree.addEventListener("touchstart", () => {
+        console.log("AĞAÇ DOKUNULDU 🌲");
+        game.style.display = "block";
+        startGame();
+    });
+
+});
 
 closeGame.addEventListener("click", () => {
     game.style.display = "none";
     clearInterval(gameInterval);
 });
-
-function updateNeon() {
-    game.className = "";
-
-    if (score >= 20) game.classList.add("neon-5");
-    else if (score >= 15) game.classList.add("neon-4");
-    else if (score >= 10) game.classList.add("neon-3");
-    else if (score >= 5) game.classList.add("neon-2");
-    else game.classList.add("neon-1");
-}
-
-gift.onclick = () => {
-    score++;
-    document.getElementById("score").innerText = "Skor: " + score;
-    updateNeon();
-    gift.remove();
-};
-
-
 
 </script>
 
